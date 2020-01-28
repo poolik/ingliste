@@ -122,7 +122,7 @@ function updateRemoteState(client, req) {
   return d.promise;
 }
 
-function sendRemoteState(state) {
+function sendState(state) {
   var d = deferred();
   authenticatedSocket.once('message', function(msg) {
     var msgObj = JSON.parse(msg);
@@ -187,7 +187,7 @@ app.post('/remote', ensureAuthenticated, function(req, res) {
               return queryRemoteState(client);
             })
             .then (function (state) {
-              return sendRemoteState(state);
+              return sendState(state);
             })
             .catch(function (error) {
               return restoreInitialState(client, initialState, error);
@@ -202,6 +202,24 @@ app.post('/remote', ensureAuthenticated, function(req, res) {
         res.status(500).send("ERROR: " + error);
       });
     });
+  } else {
+    res.status(503).send("ERROR: remote is offline!");
+  }
+});
+
+app.post('/command', ensureAuthenticated, function(req, res) {
+  if (authenticatedSocket !== null) {
+    if (req.body.command === 'restart') {
+      sendState({ command: 'sudo reboot' })
+        .done(function (state) {
+          res.status(200).send(state);
+        }, function (error) {
+          console.error(error);
+          res.status(500).send("ERROR: " + error);
+        });
+    } else {
+      res.status(503).send("ERROR: unknown command!");
+    }
   } else {
     res.status(503).send("ERROR: remote is offline!");
   }

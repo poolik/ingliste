@@ -1,0 +1,9 @@
+<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+<div class="buttongroup col-xs-12 col-md-4">
+    <!-- restart -->
+    <div class="col-xs-12 text-center">
+      <span class="btn btn-danger col-xs-12" ng-click="sendCommand('restart')">
+        <i class="fa fa-2x fa-refresh"></i> restart
+      </span>
+    </div>
+</div>

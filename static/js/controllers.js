@@ -99,3 +99,39 @@ app.controller('RemoteCtrl', ['$scope', '$http', 'observeOnScope', 'rx', '$q',
       addErrorAlert(data.data);
     }
   }]);
+
+app.controller('PiCtrl', ['$scope', '$http',
+  function ($scope, $http) {
+    $scope.alerts = [];
+
+    $scope.closeAlert = function(index) {
+      $scope.alerts.splice(index, 1);
+    };
+
+    $scope.sendCommand = function(command) {
+      console.log(command);
+      document.body.style.opacity = "0.5";
+      $http.post("/command", { command }).then(function(data) {
+        finishRequest(data);
+        addInfoAlert("Successfully updated!");
+      }, errorHandler);
+    };
+
+    function addInfoAlert(msg) {
+      $scope.alerts.push({type:'success', msg: msg});
+    }
+
+    function addErrorAlert(msg) {
+      $scope.alerts.push({type:'danger', msg: msg});
+    }
+
+    function finishRequest(data) {
+      console.log(data);
+      document.body.style.opacity = "1";
+    }
+
+    function errorHandler(data) {
+      finishRequest(data);
+      addErrorAlert(data.data);
+    }
+  }]);
