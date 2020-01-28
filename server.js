@@ -74,7 +74,7 @@ app.post('/file-upload', multer({ dest: './uploads/', putSingleFilesInArray: tru
         } else {
           _.each(req.files, function(file) {
             var metadata = file[0];
-            fs.rename(metadata.path, UPLOADS + "/" + metadata.originalname);
+            fs.renameSync(metadata.path, UPLOADS + "/" + metadata.originalname);
           });
           res.status(200).end();
         }
