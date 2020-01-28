@@ -73,21 +73,25 @@ function ReconnectSocket(url) {
 
   function message(data) {
     var messageObj = JSON.parse(data);
-    winston.info("RECEIVED: " + messageObj);
-    var button = create_button_name(messageObj.mode, messageObj.temperature);
-    if (messageObj.off) {
-      button = 'OFF';
+    winston.info("RECEIVED: " + JSON.stringify(messageObj));
+    if (messageObj.command !== undefined) {
+      executeAndRespond(messageObj.command);
+    } else {
+      if (messageObj.off) {
+        executeAndRespond('irsend SEND_ONCE AC OFF');
+      } else {
+        executeAndRespond('irsend SEND_ONCE AC ' + messageObj.mode + '_ON_' + messageObj.temperature);
+      }
     }
-    exec('irsend SEND_ONCE AC ' + button, function (error, stdout, stderr) {
+  }
+
+  function executeAndRespond(command) {
+    exec(command, function (error, stdout, stderr) {
       if (error)
         sendError(stderr);
       else
         sendSuccess("Successfully sent command");
     });
-  }
-
-  function create_button_name(mode, temp) {
-    return mode + "_ON_" + temp;
   }
 
   function sendError(message) {
